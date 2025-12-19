@@ -286,7 +286,7 @@ module Fluent::Plugin
     def compression_suffix(compress)
       case compress
       when :gzip then '.gz'
-      when :zstd then '.zstd'
+      when :zstd then '.zst'
       when nil then ''
       else
         raise ArgumentError, "unknown compression type #{compress}"

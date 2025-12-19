@@ -459,7 +459,7 @@ class FileOutputTest < Test::Unit::TestCase
         </buffer>
       ]
 
-      assert_false File.exist?("#{TMP_DIR}/out_file_test.20110102_0.log.zstd")
+      assert_false File.exist?("#{TMP_DIR}/out_file_test.20110102_0.log.zst")
 
       time = event_time("2011-01-02 13:14:15 UTC")
       d.run(default_tag: 'test') do
@@ -467,8 +467,8 @@ class FileOutputTest < Test::Unit::TestCase
         d.feed(time, {"a"=>2})
       end
 
-      assert File.exist?("#{TMP_DIR}/out_file_test.20110102_0.log.zstd")
-      check_zipped_result("#{TMP_DIR}/out_file_test.20110102_0.log.zstd", %[2011-01-02T13:14:15Z\ttest\t{"a":1}#{@default_newline}] + %[2011-01-02T13:14:15Z\ttest\t{"a":2}#{@default_newline}], type: :zstd)
+      assert File.exist?("#{TMP_DIR}/out_file_test.20110102_0.log.zst")
+      check_zipped_result("#{TMP_DIR}/out_file_test.20110102_0.log.zst", %[2011-01-02T13:14:15Z\ttest\t{"a":1}#{@default_newline}] + %[2011-01-02T13:14:15Z\ttest\t{"a":2}#{@default_newline}], type: :zstd)
     end
   end
 
@@ -626,7 +626,12 @@ class FileOutputTest < Test::Unit::TestCase
     }
 
     log_file_name = "out_file_test.20110102.log"
-    if compression != "text"
+    case compression
+    when "text"
+      #don't append anything
+    when "zstd"
+      log_file_name << ".zst"
+    else
       log_file_name << ".#{compression}"
     end
 
@@ -932,8 +937,8 @@ class FileOutputTest < Test::Unit::TestCase
       assert_equal '.gz', @i.compression_suffix(:gzip)
     end
 
-    test 'returns .zstd for zstd' do
-      assert_equal '.zstd', @i.compression_suffix(:zstd)
+    test 'returns .zst for zstd' do
+      assert_equal '.zst', @i.compression_suffix(:zstd)
     end
   end
 
